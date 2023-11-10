@@ -5,7 +5,9 @@ import 'package:newsapp_with_api/common/utils/colors.dart';
 import 'package:newsapp_with_api/consts/vars.dart';
 import 'package:newsapp_with_api/provider/themeprovider.dart';
 import 'package:newsapp_with_api/services/utils.dart';
+import 'package:newsapp_with_api/widgets/article_widget.dart';
 import 'package:newsapp_with_api/widgets/drawer.dart';
+import 'package:newsapp_with_api/widgets/loding-widget.dart';
 import 'package:newsapp_with_api/widgets/tab.dart';
 import 'package:newsapp_with_api/widgets/textWidget.dart';
 import 'package:newsapp_with_api/widgets/vertical_spacing.dart';
@@ -22,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   //var news
   var newsType = NewsType.allNews;
   int currentPageIndex = 0;
+  String sortBy = SortByEnum.publishedAt.name;
+
   @override
   Widget build(BuildContext context) {
 //theme
@@ -156,6 +160,36 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
+            const VerticalSpacing(10),
+            newsType == NewsType.topTrending
+                ? Container()
+                : Align(
+                    alignment: Alignment.topRight,
+                    child: Material(
+                      color: Theme.of(context).cardColor,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: DropdownButton(
+                            value: sortBy,
+                            items: dropDownItems,
+                            onChanged: (String? value) {
+                              setState(() {
+                                sortBy = value!;
+                              });
+                            }),
+                      ),
+                    ),
+                  ),
+
+            SizedBox(
+              height: 500,
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return LodingWidget();
+                },
+              ),
+            )
+            //  ArticlesWidget(),
             //Switch
             // SwitchListTile(
             //     title: Text(
@@ -177,6 +211,27 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  //dropdown Button
+  List<DropdownMenuItem<String>> get dropDownItems {
+    List<DropdownMenuItem<String>> menuItem = [
+      DropdownMenuItem(
+        value: SortByEnum.relevancy.name,
+        child: Text(SortByEnum.relevancy.name),
+      ),
+      DropdownMenuItem(
+        value: SortByEnum.publishedAt.name,
+        child: Text(SortByEnum.publishedAt.name),
+      ),
+      DropdownMenuItem(
+        value: SortByEnum.popularity.name,
+        child: Text(SortByEnum.popularity.name),
+      ),
+    ];
+    return menuItem;
+  }
+
+  //nextButton
 
   Widget pageButton({required String text, required Function function}) {
     return ElevatedButton(
